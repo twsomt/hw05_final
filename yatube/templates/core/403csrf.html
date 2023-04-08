@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}403csrf{% endblock %}
+{% block content %}
+<div class="container py-5">
+	<h1>403</h1>
+	<p>Ошибка проверки csrf-токена</p>
+	<a href="{% url 'posts:index' %}">На главную</a>
+</div>
+{% endblock %}

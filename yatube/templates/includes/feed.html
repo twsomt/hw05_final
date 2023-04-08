@@ -1,0 +1,43 @@
+{% load thumbnail %}
+{% if page_obj %}
+  {% with request.resolver_match.view_name as view_name %}
+  {% for post in page_obj %}
+  <article>
+    <ul>
+      <li>
+        Автор:
+          {% if view_name  == 'posts:profile' %}
+            {{ post.author.get_full_name }}
+          {% else %}
+            <a href="{% url 'posts:profile' post.author.username %}">
+              {{ post.author.get_full_name }}
+            </a>
+          {% endif %} 
+      </li>
+      <li>
+        Дата публикации: {{ post.pub_date|date:"d E Y" }}
+      </li>
+    </ul>
+    {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+      <img class="card-img my-2" src="{{ im.url }}" style="max-width: 30%;">
+    {% endthumbnail %}
+    <p>{{ post.text }}</p>
+    <a href="{% url 'posts:post_detail' post.pk %}">
+      Подробнее <span class="text-muted">о посте</span>
+    </a>
+    <br>
+    {% if post.group and view_name  != 'posts:group_list'%}
+      <a href="{% url 'posts:group_list' post.group.slug %}">
+        Показать все записи сообщества
+      </a>
+      <span class="text-muted">{{ post.group.title }}</span>
+    {% endif %}
+  <article>
+  {% if not forloop.last %}
+  <hr>
+  {% endif %}
+  {% endfor %}
+  {% endwith %}
+{% else %}
+    <p>Пока что тут пусто. Пока что...</p>
+{% endif %}

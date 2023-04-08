@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+Об авторе
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12">
+        <h1>Андрей Волков</h1>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <p>Мне {{ age }}, я из Питера, работаю руководителем отдела продаж. В веб-разработку пришел около года назад, через программирование игровых ботов на Lua. </p>
+        <p>Помимо Python немного попробовал Ruby, PHP и JS. Интересуюсь всем что связано с вебом, а также разными другими околокодерскими темами. Закончил
+          курс Яндекс-практикума по SQL (PostgreSQL), и почти закончил базовый курс по верстке EpicSkills в Петербурге.</p>
+        <p>Хочу сменить род деятельности и устроиться на работу веб-разработчиком. В настоящее время активно учусь, админю <a href="https://t.me/beginner_at_python_chat" target="_blank">телеграм-канал</a> для начинающих питонистов, пилю пет-проекты. Ссылки на некоторые из них вы
+            можете увидеть ниже. По мере получения новых знаний, делаю их лучше :)
+        </p>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <img src="{% static 'img/iam.jpg' %}" class="rounded">
+      </div>
+    </div>
+  </div>
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12">
+        <h2>Мои работы</h2>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <p><a href="https://goraffle.ru/" target="_blank">goraffle.ru</a></p>
+        <p>Сайт для проведения конкурсов ВКонтакте. Удобно и бесплатно. 
+          Достаточно ввести ссылку на пост, количество победителей и приз, все остальное сделается само.
+        Гибкие настройки конкурсов.</p>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <p><a href="#">truekp</a></p>
+        <p>Сайт для генерации коммерческих предложений. Удобно, но платно.
+          Можно сделать шаблон предложения с описанием технических характеристик товара, 
+          и ретранслировать его всем сотрудникам. <span style="color: red;">*</span></p>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <p><a href="#">WorkFinder</a></p>
+        <p>Напишите письмо и укажите вашу профессию и город. 
+          Программа найдет в интернете десятки тысяч компаний, специализирующихся на вашей тематике, и разошлет на емейлы HR ваше письмо.
+          <span style="color: red;">*</span>
+        </p>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <p><a href="#">Пет-проекты Практикума</a></p>
+        <p>Модуль фитнес-трекера и социальная сеть YaTube.</p>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12">
+        <h2>Где еще я есть?</h2>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12">
+        <a href="https://github.com/twsomt" target="_blank">
+          <img src="{% static 'img/github_logo.png' %}">
+        </a>
+        <a href="https://t.me/twsomt" target="_blank">
+          <img src="{% static 'img/telegram_logo.png' %}">
+        </a>
+        <a href="https://www.codewars.com/users/twsomt" target="_blank">
+          <img src="{% static 'img/codewars_logo.jpg' %}" class="rounded">
+        </a>
+        <a href="https://stepik.org/users/475145668" target="_blank">
+          <img src="{% static 'img/stepik_logo.jpg' %}">
+        </a>
+        <p class="mt-3">Почта: <a href="mailto: mihailmaximov@gmail.com">twsomt@ya.ru</a></p>
+      </div>
+    </div>
+    <p class="mt-4"><span style="color: red;">*</span> - проект в разработке</p>
+  </div>
+</body>
+<!-- конец всей страницы -->
+
+</html>
+{% endblock %}

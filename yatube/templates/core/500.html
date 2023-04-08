@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}500{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1>500</h1>
+  <p>Cервер не может обработать запрос</p>
+  <a href="{% url 'posts:index' %}">На главную</a>
+</div>
+{% endblock %}
+
