@@ -1,12 +1,13 @@
 # import time
-# 
+#
 from django import forms
 from django.core.paginator import Page
 from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 
-from posts.constants import CACHE_TIMER, LEN_PUBLIC_FEED, LEN_TITLE_POST_DETAIL
+from posts.constants import LEN_PUBLIC_FEED, LEN_TITLE_POST_DETAIL
+# from posts.constants import CACHE_TIMER
 from posts.forms import CommentForm
 from posts.models import Follow, Group, Post, User
 from posts.tests.data import DataForTests
