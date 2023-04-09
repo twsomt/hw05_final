@@ -2,9 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.cache import cache_page
+# from django.views.decorators.cache import cache_page
 
-from .constants import CACHE_TIMER, LEN_TITLE_POST_DETAIL
+from .constants import LEN_TITLE_POST_DETAIL
+# from .constants import CACHE_TIMER
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post
 from .paginator import paginator
