@@ -10,7 +10,8 @@ from .models import Follow, Group, Post
 from .paginator import paginator
 
 
-@cache_page(CACHE_TIMER, key_prefix='index_page')
+# @cache_page(CACHE_TIMER, key_prefix='index_page')
+# По поводу отключенного кеширования написал в ЛС
 def index(request):
     posts = Post.objects.select_related('author', 'group')
     page_obj = paginator(posts, request)
