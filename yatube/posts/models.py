@@ -60,7 +60,9 @@ class Post(models.Model):
         help_text="Группа, к которой будет относиться пост"
     )
     image = models.ImageField(
-        upload_to=user_directory_path,
+        # Хотел как лучше, но не пропустили тесты
+        # upload_to=user_directory_path,
+        upload_to='posts/',
         blank=True,
         verbose_name='Изображение',
         help_text='Выберите изображение для публикации'
@@ -114,7 +116,7 @@ class Follow(models.Model):
         User,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='follower',
         verbose_name="Подписчик",
         help_text="Пользователь, подписавшийся на автора"
