@@ -1,5 +1,5 @@
-import time
-
+# import time
+# 
 from django import forms
 from django.core.paginator import Page
 from django.shortcuts import get_object_or_404
