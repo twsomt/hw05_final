@@ -32,11 +32,6 @@ class StaticURLTests(TestCase):
             slug='test_group_slug',
             description='Описание тестовой группы.'
         )
-        cls.another_group = Group.objects.create(
-            title='Тестовая группа #2',
-            slug='test_group_slug_2',
-            description='Описание второй тестовой группы.'
-        )
         cls.img_code = (
             b'\x47\x49\x46\x38\x39\x61\x01\x00'
             b'\x01\x00\x00\x00\x00\x21\xf9\x04'
