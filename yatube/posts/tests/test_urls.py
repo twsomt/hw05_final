@@ -5,7 +5,6 @@ from django.test import Client, TestCase
 
 # from posts.constants import CACHE_TIMER
 from posts.models import Comment, Group, Post, User
-from posts.forms import CommentForm
 
 from django.conf import settings
 
