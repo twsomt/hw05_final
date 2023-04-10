@@ -109,7 +109,7 @@ class StaticURLTests(TestCase):
         self.another_client.force_login(self.no_author)
 
     def test_page_status_get_method(self):
-        '''Проверка ответов основных адресов и соответствия шаблонов (GET).'''
+        '''Проверка ответов основных адресов и соответствия шаблонов.'''
 
         for test in StaticURLTests.TEST_DATA_PAGES:
             with self.subTest(test['title']):

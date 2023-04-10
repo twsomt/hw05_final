@@ -1,5 +1,8 @@
 # import time
 #
+
+from http import HTTPStatus
+
 from django import forms
 from django.core.paginator import Page
 from django.shortcuts import get_object_or_404
@@ -12,13 +15,128 @@ from posts.forms import CommentForm
 from posts.models import Follow, Group, Post, User
 from posts.tests.data import DataForTests
 
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase
 
-class ViewsTests(DataForTests):
+from posts.constants import CACHE_TIMER
+from posts.models import Comment, Group, Post, User
+
+
+class ViewsTests(TestCase):
     '''Проверка основных адресов и соответствия шаблонов.'''
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(
+            username='test_user',
+            password='test_password'
+        )
+        cls.no_author = User.objects.create_user(
+            username='test_user_no_author',
+            password='test_password'
+        )
+        cls.another_user = User.objects.create_user(
+            username='test_user_for_edit_test',
+            password='test_password'
+        )
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_group_slug',
+            description='Описание тестовой группы.'
+        )
+        cls.another_group = Group.objects.create(
+            title='Тестовая группа #2',
+            slug='test_group_slug_2',
+            description='Описание второй тестовой группы.'
+        )
+        cls.img_code = (
+            b'\x47\x49\x46\x38\x39\x61\x01\x00'
+            b'\x01\x00\x00\x00\x00\x21\xf9\x04'
+            b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
+            b'\x00\x00\x01\x00\x01\x00\x00\x02'
+            b'\x02\x4c\x01\x00\x3b'
+        )
+        cls.img = SimpleUploadedFile(
+            name='test_img_1.jpg',
+            content=cls.img_code,
+            content_type='image/jpg'
+        )
+        cls.post = Post.objects.create(
+            text='Текст первого поста для тестов.',
+            author=cls.author,
+            group=cls.group,
+            image=cls.img,
+        )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            text='Тестовый комментарий',
+            author=cls.author,
+        )
+
+        cls.TEST_DATA_PAGES = [
+            {
+                'title': 'Главная страница',
+                'reverse_name': 'posts:index',
+                'html_template': 'posts/index.html',
+                'cache': CACHE_TIMER,
+            }, {
+                'title': 'Страница с постами группы',
+                'reverse_name': 'posts:group_list',
+                'html_template': 'posts/group_list.html',
+                'args': [cls.group.slug],
+            }, {
+                'title': 'Страница пользователя',
+                'reverse_name': 'posts:profile',
+                'html_template': 'posts/profile.html',
+                'args': [cls.author.username],
+            }, {
+                'title': 'Страница с деталями поста',
+                'reverse_name': 'posts:post_detail',
+                'html_template': 'posts/post_detail.html',
+                'args': [cls.post.id],
+            }, {
+                'title': 'Страница создания поста',
+                'reverse_name': 'posts:post_create',
+                'need_authorization': True,
+                'html_template': 'posts/create_post.html',
+            }, {
+                'title': 'Страница редактирования поста автором',
+                'reverse_name': 'posts:edit',
+                'need_authorization': True,
+                'html_template': 'posts/create_post.html',
+                'args': [cls.post.id],
+            }, {
+                'title': 'Страница с моими подписками',
+                'reverse_name': 'posts:follow_index',
+                'need_authorization': True,
+                'html_template': 'posts/follow.html',
+            },
+        ]
+        cls.TEST_DATA_ACTIONS = [
+            {
+                'title': 'Прокомментировать пост',
+                'reverse_name': 'posts:add_comment',
+                'args': [cls.post.id],
+            }, {
+                'title': 'Подписаться на автора',
+                'reverse_name': 'posts:profile_follow',
+                'args': [cls.author.username],
+            }, {
+                'title': 'Отписаться от автора',
+                'reverse_name': 'posts:profile_unfollow',
+                'args': [cls.author.username],
+            },
+        ]
+   
+    def setUp(self):
+        self.author_client = Client()
+        self.author_client.force_login(self.author)
+        self.another_client = Client()
+        self.another_client.force_login(self.no_author)
 
     def test_response_view_func(self):
-        '''Функции используют ожидаемые шаблоны.'''
-        for test in self.TEST_DATA:
+        '''Функции страниц используют ожидаемые шаблоны.'''
+        for test in ViewsTests.TEST_DATA_PAGES:
             with self.subTest(test['title']):
 
                 if test.get('need_authorization'):
@@ -33,6 +151,15 @@ class ViewsTests(DataForTests):
                     reverse(test['reverse_name'], args=test.get('args'))
                 )
                 self.assertTemplateUsed(response, test['html_template'])
+
+    def test_actions_pathes(self):
+        '''Функции действий доступны через имена и возвращат редиректы.'''
+        for test in ViewsTests.TEST_DATA_ACTIONS:
+            with self.subTest(test['title']):
+                response = self.another_client.get(
+                    reverse(test['reverse_name'], args=test.get('args'))
+                )
+                self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def post_fields_check(self, post):
         '''Вспомогательная функция для проверки полей объекта класса Post.'''
@@ -232,41 +359,49 @@ class FollowViewsTest(DataForTests):
     '''Подписки функционируют нормально.'''
 
     def creater(self):
-        '''Вспомогательная функция для создания подписки.'''
+        '''Вспомогательная функция для подписки на автора.'''
         Follow.objects.create(
             user=self.no_author,
             author=self.author
         )
 
-    def test_authorized_user_follow(self):
-        '''Авторизованный юзер может подписаться на автора поста.'''
-        self.another_client.get(
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.post.author.username},
-            )
-        )
-        follow_obj = Follow.objects.latest('id')
-        self.assertEqual(follow_obj.user_id, self.no_author.id)
-        self.assertEqual(follow_obj.author_id, self.post.author.id)
-
-    def test_authorized_user_unfollow(self):
-        '''Авторизованный юзер может отписаться от автора поста.'''
-        self.another_client.get(
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.post.author.username},
-            )
-        )
-        followers_cnt_subscribing = Follow.objects.count()
-
+    def uncreater(self):
+        '''Вспомогательная функция для отписки от автора.'''
         self.another_client.get(
             reverse(
                 'posts:profile_unfollow',
                 kwargs={'username': self.post.author.username},
             )
         )
+    
+    def test_authorized_user_follow(self): 
+        '''Авторизованный юзер может подписаться на автора поста.''' 
+
+        self.creater()
+        follow_obj = Follow.objects.latest('id')
+        self.assertEqual(follow_obj.user_id, self.no_author.id)
+        self.assertEqual(follow_obj.author_id, self.post.author.id)
+
+    def test_authorized_user_follow_unfollow(self):
+        '''Авторизованный юзер может подписаться и отписаться на(от) автора.'''
+        
+        # Создаем подписку и проверяем что она создалась
+        self.creater()
+        follow_obj = Follow.objects.latest('id')
+        self.assertEqual(follow_obj.user_id, self.no_author.id)
+        self.assertEqual(follow_obj.author_id, self.post.author.id)
+
+        # Запоминаем число подписок
+        followers_cnt_subscribing = Follow.objects.count()
+
+        # Отписываемся и проверяем, что отписались
+        self.uncreater()
         self.assertEqual(Follow.objects.count(), followers_cnt_subscribing - 1)
+        self.assertFalse(
+            Follow.objects.filter(
+                user=self.no_author.id,
+                author=self.post.author.id,
+            ).exists())
 
     def test_follow_post_on_follow_page(self):
         '''После подписки пост попадает на страницу подписок.'''
