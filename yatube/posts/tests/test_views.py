@@ -2,10 +2,10 @@
 #
 import shutil
 import tempfile
-from django.conf import settings
 from http import HTTPStatus
 
 from django import forms
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Page
 from django.shortcuts import get_object_or_404
@@ -18,6 +18,7 @@ from posts.forms import CommentForm
 from posts.models import Comment, Follow, Group, Post, User
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ViewsTests(TestCase):
@@ -125,7 +126,7 @@ class ViewsTests(TestCase):
                 'args': [cls.author.username],
             },
         ]
-    
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -136,7 +137,6 @@ class ViewsTests(TestCase):
         self.author_client.force_login(self.author)
         self.another_client = Client()
         self.another_client.force_login(self.no_author)
-        
 
     def test_response_view_func(self):
         '''Функции страниц используют ожидаемые шаблоны.'''

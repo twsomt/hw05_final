@@ -1,16 +1,16 @@
-from http import HTTPStatus
 import shutil
 import tempfile
+from http import HTTPStatus
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.conf import settings
-from posts.models import Comment, Post
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
+from django.urls import reverse
 
 from posts.models import Comment, Group, Post, User
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostFormTest(TestCase):
@@ -40,7 +40,7 @@ class PostFormTest(TestCase):
         )
         cls.uploaded = SimpleUploadedFile(
             name='small.gif',
-            content=PostFormTest.small_gif,
+            content=cls.small_gif,
             content_type='image/gif'
         )
         cls.post = Post.objects.create(
@@ -87,9 +87,17 @@ class PostFormTest(TestCase):
 
     def test_post_edit_author(self):
         '''Автор может редактировать пост.'''
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=PostFormTest.small_gif,
+            content_type='image/gif'
+        )
         response = self.author_client.post(
             reverse('posts:edit', args=[self.post.id]),
-            {'text': 'Обновленный текст №1'}
+            {'text': 'Обновленный текст №1',
+             'group': PostFormTest.group.id,
+             'image': uploaded,
+             }
         )
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.post.refresh_from_db()

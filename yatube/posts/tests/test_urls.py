@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
 # from posts.constants import CACHE_TIMER
