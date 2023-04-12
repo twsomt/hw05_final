@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.constants import CACHE_TIMER, LEN_PUBLIC_FEED, LEN_TITLE_POST_DETAIL
+from django.conf import settings
 # from posts.constants import CACHE_TIMER
 from posts.forms import CommentForm
 from posts.models import Comment, Follow, Group, Post, User
@@ -77,7 +77,7 @@ class ViewsTests(TestCase):
                 'title': 'Главная страница',
                 'reverse_name': 'posts:index',
                 'html_template': 'posts/index.html',
-                'cache': CACHE_TIMER,
+                'cache': settings.CACHE_TIMER,
             }, {
                 'title': 'Страница с постами группы',
                 'reverse_name': 'posts:group_list',
@@ -260,7 +260,7 @@ class ViewsTests(TestCase):
         # short_text_title
         short_text_title = context['short_text_title']
         expected_short_text_title = (
-            ViewsTests.post.text[:LEN_TITLE_POST_DETAIL])
+            str(ViewsTests.post)[:settings.LEN_TITLE_POST_DETAIL])
         self.assertEqual(short_text_title, expected_short_text_title)
 
         # qty_posts
@@ -333,7 +333,7 @@ class PaginatorViewsTest(TestCase):
         page_obj = response.context['page_obj']
         self.assertIsInstance(page_obj, Page)
         self.assertEqual(
-            len(page_obj), LEN_PUBLIC_FEED
+            len(page_obj), settings.LEN_PUBLIC_FEED
         )
 
     def test_second_page_contains_three_records(self):
@@ -342,7 +342,7 @@ class PaginatorViewsTest(TestCase):
         page_obj = response.context['page_obj']
         self.assertIsInstance(page_obj, Page)
         self.assertEqual(
-            len(page_obj), self.qty_posts - LEN_PUBLIC_FEED
+            len(page_obj), self.qty_posts - settings.LEN_PUBLIC_FEED
         )
 
 
