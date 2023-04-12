@@ -80,10 +80,12 @@ class StaticURLTests(TestCase):
                 'url_name': f'/posts/{StaticURLTests.post.id}/comment/',
             }, {
                 'title': 'Подписаться на автора',
-                'url_name': f'/posts/{StaticURLTests.post.id}/comment/',
+                'url_name':
+                    f'/profile/{StaticURLTests.author.username}/follow/',
             }, {
                 'title': 'Отписаться от автора',
-                'url_name': f'/posts/{StaticURLTests.post.id}/comment/',
+                'url_name':
+                    f'/profile/{StaticURLTests.author.username}/unfollow/',
             },
         ]
 

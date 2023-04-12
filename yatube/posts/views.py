@@ -2,9 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.conf import settings
 
-from .constants import LEN_TITLE_POST_DETAIL
-# from .constants import CACHE_TIMER
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post
 from .paginator import paginator
@@ -61,7 +60,7 @@ def post_detail(request, post_id):
         pk=post_id
     )
     qty_posts = post.author.posts.count()
-    short_text_title = post.text[:LEN_TITLE_POST_DETAIL]
+    short_text_title = post.text[:settings.LEN_TITLE_POST_DETAIL]
     form = CommentForm()
     comments = post.comments.select_related('author',)
     context = {

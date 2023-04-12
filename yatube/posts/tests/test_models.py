@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
+from django.conf import settings
 
-from posts.constants import LEN_DEF__STR__POST_MODEL
 from posts.models import Comment, Follow, Group, Post, User
 
 User = get_user_model()
@@ -30,7 +30,7 @@ class PostModelTest(TestCase):
     def test_model_post_have_correct_object_names(self):
         """Проверяем, что у модели Post корректно работает __str__."""
         expected_post_str = (PostModelTest.post
-                             .text[:LEN_DEF__STR__POST_MODEL] + '...')
+                             .text[:settings.LEN_DEF__STR__POST_MODEL] + '...')
         self.assertEqual(
             str(PostModelTest.post),
             expected_post_str,
