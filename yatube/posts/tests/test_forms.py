@@ -88,30 +88,40 @@ class PostFormTest(TestCase):
     def test_post_edit_author(self):
         '''Автор может редактировать пост.'''
         uploaded = SimpleUploadedFile(
-            name='small.gif',
+            name='small_new.gif',
             content=PostFormTest.small_gif,
             content_type='image/gif'
         )
         response = self.author_client.post(
             reverse('posts:edit', args=[self.post.id]),
             {'text': 'Обновленный текст №1',
+             'author': PostFormTest.no_author,
              'group': PostFormTest.group.id,
              'image': uploaded,
              }
         )
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.post.refresh_from_db()
-        self.assertEqual(self.post.text, 'Обновленный текст №1')
+        self.assertTrue(
+            Post.objects.filter(
+                text='Обновленный текст №1',
+                author=PostFormTest.author,
+                group=PostFormTest.group,
+                image='posts/small_new.gif'
+            ).exists()
+        )
 
     def test_post_edit_no_author(self):
         '''НЕ автор НЕ может редактировать пост.'''
+        posts_counter = Post.objects.count()
         response = self.another_client.post(
             reverse('posts:edit', args=[self.post.id]),
-            {'text': 'Обновленный текст №1'}
+            {'text': 'Обновленный текст №2, который мы не увидим'}
         )
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
         self.post.refresh_from_db()
         self.assertEqual(self.post.text, 'Текст первого поста для тестов.')
+        self.assertEqual(Post.objects.count(), posts_counter)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
