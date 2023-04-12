@@ -152,6 +152,18 @@ class CommentModelTest(TestCase):
         self.author_client = Client()
         self.author_client.force_login(self.author)
 
+    def test_model_post_have_correct_object_names(self):
+        """Проверяем, что у модели Comment корректно работает __str__."""
+        expected_post_str = (CommentModelTest.post
+                             .text[:settings.LEN_DEF__STR__POST_MODEL] + '...')
+        self.assertEqual(
+            str(CommentModelTest.post),
+            expected_post_str,
+            "Метод __str__ в модели Post работает неверно. "
+            f"Ожидалось '{expected_post_str}', "
+            f"получено '{str(CommentModelTest.post)}'"
+        )
+
     def test_verbose_name(self):
         """verbose_name в полях модели Comment совпадает с ожидаемым."""
         comment = CommentModelTest.comment
