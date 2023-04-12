@@ -1,19 +1,15 @@
-# import time
-#
 import shutil
 import tempfile
 from http import HTTPStatus
 
 from django import forms
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Page
 from django.shortcuts import get_object_or_404
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-
-from django.conf import settings
-# from posts.constants import CACHE_TIMER
 from posts.forms import CommentForm
 from posts.models import Comment, Follow, Group, Post, User
 
@@ -77,7 +73,6 @@ class ViewsTests(TestCase):
                 'title': 'Главная страница',
                 'reverse_name': 'posts:index',
                 'html_template': 'posts/index.html',
-                'cache': settings.CACHE_TIMER,
             }, {
                 'title': 'Страница с постами группы',
                 'reverse_name': 'posts:group_list',
@@ -148,9 +143,6 @@ class ViewsTests(TestCase):
                 else:
                     current_client = self.client
 
-                # if test.get('cache'):
-                #     time.sleep(test['cache'])  # Косвенно тестируем кеш
-
                 response = current_client.get(
                     reverse(test['reverse_name'], args=test.get('args'))
                 )
@@ -195,7 +187,6 @@ class ViewsTests(TestCase):
 
     def test_index_page_show_correct_context(self):
         '''Шаблон index сформирован с правильным контекстом.'''
-        # time.sleep(CACHE_TIMER)  # Косвенно тестируем кеш
         response = self.client.get(reverse('posts:index'))
 
         context = response.context
@@ -328,7 +319,6 @@ class PaginatorViewsTest(TestCase):
 
     def test_first_page_contains_ten_records(self):
         '''Количество постов на первой странице равно 10.'''
-        # time.sleep(CACHE_TIMER)  # Косвенно тестируем кеш
         response = self.client.get(reverse('posts:index'))
         page_obj = response.context['page_obj']
         self.assertIsInstance(page_obj, Page)
@@ -346,17 +336,73 @@ class PaginatorViewsTest(TestCase):
         )
 
 
-# class CasheTest(DataForTests):
-#     '''Страница index кешируется с интервалом CACHE_TIMER сек.'''
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+class CacheTest(TestCase):
+    '''Страница index кешируется с интервалом CACHE_TIMER сек.'''
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(
+            username='test_user',
+            password='test_password'
+        )
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_group_slug',
+            description='Описание тестовой группы.'
+        )
+        cls.img_code = (
+            b'\x47\x49\x46\x38\x39\x61\x01\x00'
+            b'\x01\x00\x00\x00\x00\x21\xf9\x04'
+            b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
+            b'\x00\x00\x01\x00\x01\x00\x00\x02'
+            b'\x02\x4c\x01\x00\x3b'
+        )
+        cls.img = SimpleUploadedFile(
+            name='test_img_1.jpg',
+            content=cls.img_code,
+            content_type='image/jpg'
+        )
+        cls.post = Post.objects.create(
+            text='Текст первого поста для тестов.',
+            author=cls.author,
+            group=cls.group,
+        )
 
-#     def test_cache(self):
-#         '''Сразу после публикации новый пост не виден.'''
-#         response = self.client.get(reverse('posts:index'))
-#         context = response.context
-#         self.assertIsNone(context)
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
-        # то, что пост виден после публикации + паузы, проверяется выше
-        # в тестах контекста
+    def setUp(self):
+        self.author_client = Client()
+        self.author_client.force_login(self.author)
+
+    def test_cache(self):
+        '''Пост виден через settings.CACHE_TIMER сек после публикации.'''
+        # Обращаемся к странице до изменений
+        # Изменений еще нет
+        response = self.author_client.get(reverse('posts:index'))
+        before_action = response.content
+
+        # Изменяем текст поста
+        CacheTest.post.text = 'Текст после изменений'
+        CacheTest.post.save()
+
+        # Обращаемся к странице сразу после изменений
+        # Изменения не должны быть видны
+        response = self.author_client.get(reverse('posts:index'))
+        after_action = response.content
+        self.assertEqual(before_action, after_action)
+
+        # Чистим кеш и обращаемся еще раз
+        # Изменения должны быть видны
+        cache.clear()
+        response = self.author_client.get(reverse('posts:index'))
+        after_action_and_clear_cache = response.content
+        self.assertNotEqual(before_action, after_action_and_clear_cache)
+        self.assertNotEqual(after_action, after_action_and_clear_cache)
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class FollowViewsTest(TestCase):

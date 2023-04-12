@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse
-
 from users.tests.data import DataForTests
 
 

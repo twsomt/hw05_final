@@ -1,13 +1,19 @@
 {% extends 'base.html' %}
+{% load cache %}
 {% block title%}
 Последние обновления на сайте
 {% endblock %}
+
 {% block content %}
 
 <div class="container py-5">
   {% include 'includes/switcher.html' %}
   <h1>Последние обновления на сайте</h1>
-  {% include 'includes/feed.html' %}
-  {% include 'includes/paginator.html' %}
+  {% with cache_timer as cache_time %}
+    {% cache cache_time index_page %}
+      {% include 'includes/feed.html' %}
+      {% include 'includes/paginator.html' %}
+    {% endcache %}
+  {% endwith %}
 </div>
 {% endblock %}

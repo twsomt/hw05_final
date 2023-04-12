@@ -1,7 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-from django.conf import settings
-
 from posts.models import Comment, Follow, Group, Post, User
 
 User = get_user_model()

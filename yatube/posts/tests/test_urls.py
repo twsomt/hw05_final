@@ -2,8 +2,6 @@ from http import HTTPStatus
 
 from django.conf import settings
 from django.test import Client, TestCase
-
-# from posts.constants import CACHE_TIMER
 from posts.models import Comment, Group, Post, User
 
 

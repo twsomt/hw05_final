@@ -1,24 +1,21 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.conf import settings
-
-from .forms import CommentForm, PostForm
 from posts.models import Follow, Group, Post
 from posts.paginator import paginator
 
-# from django.views.decorators.cache import cache_page
+from .forms import CommentForm, PostForm
 
 
-# @cache_page(CACHE_TIMER, key_prefix='index_page')
-# По поводу отключенного кеширования написал в ЛС
 def index(request):
     posts = Post.objects.select_related('author', 'group')
     page_obj = paginator(posts, request)
 
     context = {
         'page_obj': page_obj,
+        'cache_timer': settings.CACHE_TIMER
     }
     return render(request, 'posts/index.html', context)
 
