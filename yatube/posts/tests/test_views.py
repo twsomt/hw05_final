@@ -1,27 +1,25 @@
 # import time
 #
-
+import shutil
+import tempfile
+from django.conf import settings
 from http import HTTPStatus
 
 from django import forms
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Page
 from django.shortcuts import get_object_or_404
-from django.test import TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.constants import LEN_PUBLIC_FEED, LEN_TITLE_POST_DETAIL
+from posts.constants import CACHE_TIMER, LEN_PUBLIC_FEED, LEN_TITLE_POST_DETAIL
 # from posts.constants import CACHE_TIMER
 from posts.forms import CommentForm
-from posts.models import Follow, Group, Post, User
-from posts.tests.data import DataForTests
+from posts.models import Comment, Follow, Group, Post, User
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
-from posts.constants import CACHE_TIMER
-from posts.models import Comment, Group, Post, User
-
-
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ViewsTests(TestCase):
     '''Проверка основных адресов и соответствия шаблонов.'''
     @classmethod
@@ -127,12 +125,18 @@ class ViewsTests(TestCase):
                 'args': [cls.author.username],
             },
         ]
-   
+    
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
     def setUp(self):
         self.author_client = Client()
         self.author_client.force_login(self.author)
         self.another_client = Client()
         self.another_client.force_login(self.no_author)
+        
 
     def test_response_view_func(self):
         '''Функции страниц используют ожидаемые шаблоны.'''
@@ -354,9 +358,49 @@ class PaginatorViewsTest(TestCase):
         # то, что пост виден после публикации + паузы, проверяется выше
         # в тестах контекста
 
-
-class FollowViewsTest(DataForTests):
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+class FollowViewsTest(TestCase):
     '''Подписки функционируют нормально.'''
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(
+            username='test_user',
+            password='test_password'
+        )
+        cls.no_author = User.objects.create_user(
+            username='test_user_no_author',
+            password='test_password'
+        )
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_group_slug',
+            description='Описание тестовой группы.'
+        )
+        cls.img_code = (
+            b'\x47\x49\x46\x38\x39\x61\x01\x00'
+            b'\x01\x00\x00\x00\x00\x21\xf9\x04'
+            b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
+            b'\x00\x00\x01\x00\x01\x00\x00\x02'
+            b'\x02\x4c\x01\x00\x3b'
+        )
+        cls.img = SimpleUploadedFile(
+            name='test_img_1.jpg',
+            content=cls.img_code,
+            content_type='image/jpg'
+        )
+        cls.post = Post.objects.create(
+            text='Текст первого поста для тестов.',
+            author=cls.author,
+            group=cls.group,
+            image=cls.img,
+        )
+
+    def setUp(self):
+        self.author_client = Client()
+        self.author_client.force_login(self.author)
+        self.another_client = Client()
+        self.another_client.force_login(self.no_author)
 
     def creater(self):
         '''Вспомогательная функция для подписки на автора.'''
@@ -373,9 +417,9 @@ class FollowViewsTest(DataForTests):
                 kwargs={'username': self.post.author.username},
             )
         )
-    
-    def test_authorized_user_follow(self): 
-        '''Авторизованный юзер может подписаться на автора поста.''' 
+
+    def test_authorized_user_follow(self):
+        '''Авторизованный юзер может подписаться на автора поста.'''
 
         self.creater()
         follow_obj = Follow.objects.latest('id')
@@ -384,7 +428,7 @@ class FollowViewsTest(DataForTests):
 
     def test_authorized_user_follow_unfollow(self):
         '''Авторизованный юзер может подписаться и отписаться на(от) автора.'''
-        
+
         # Создаем подписку и проверяем что она создалась
         self.creater()
         follow_obj = Follow.objects.latest('id')

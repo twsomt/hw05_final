@@ -1,12 +1,11 @@
 from http import HTTPStatus
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
 # from posts.constants import CACHE_TIMER
 from posts.models import Comment, Group, Post, User
-
-from django.conf import settings
 
 
 class StaticURLTests(TestCase):
@@ -31,23 +30,10 @@ class StaticURLTests(TestCase):
             slug='test_group_slug',
             description='Описание тестовой группы.'
         )
-        cls.img_code = (
-            b'\x47\x49\x46\x38\x39\x61\x01\x00'
-            b'\x01\x00\x00\x00\x00\x21\xf9\x04'
-            b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
-            b'\x00\x00\x01\x00\x01\x00\x00\x02'
-            b'\x02\x4c\x01\x00\x3b'
-        )
-        cls.img = SimpleUploadedFile(
-            name='test_img_1.jpg',
-            content=cls.img_code,
-            content_type='image/jpg'
-        )
         cls.post = Post.objects.create(
             text='Текст первого поста для тестов.',
             author=cls.author,
             group=cls.group,
-            image=cls.img,
         )
         cls.comment = Comment.objects.create(
             post=cls.post,
@@ -101,7 +87,7 @@ class StaticURLTests(TestCase):
                 'url_name': f'/posts/{StaticURLTests.post.id}/comment/',
             },
         ]
-      
+
     def setUp(self):
         self.author_client = Client()
         self.author_client.force_login(self.author)
