@@ -57,7 +57,7 @@ def post_detail(request, post_id):
         pk=post_id
     )
     qty_posts = post.author.posts.count()
-    short_text_title = str(post)[:settings.LEN_TITLE_POST_DETAIL]
+    short_text_title = str(post)
     form = CommentForm()
     comments = post.comments.select_related('author',)
     context = {
@@ -90,8 +90,8 @@ def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
         return HttpResponseForbidden(
-            "Вы не можете редактировать этот пост, "
-            "поскольку не являетесь его автором"
+            'Вы не можете редактировать этот пост, '
+            'поскольку не являетесь его автором'
         )
     form = PostForm(
         request.POST or None,

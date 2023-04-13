@@ -42,11 +42,6 @@ class PostFormTest(TestCase):
             content=cls.small_gif,
             content_type='image/gif'
         )
-        cls.post = Post.objects.create(
-            text='Текст первого поста для тестов.',
-            author=cls.author,
-            group=cls.group,
-        )
 
     @classmethod
     def tearDownClass(cls):
@@ -86,13 +81,18 @@ class PostFormTest(TestCase):
 
     def test_post_edit_author(self):
         '''Автор может редактировать пост.'''
+        post = Post.objects.create(
+            text='Текст первого поста для тестов.',
+            author=PostFormTest.author,
+            group=PostFormTest.group,
+        )
         uploaded = SimpleUploadedFile(
             name='small_new.gif',
             content=PostFormTest.small_gif,
             content_type='image/gif'
         )
         response = self.author_client.post(
-            reverse('posts:edit', args=[self.post.id]),
+            reverse('posts:edit', args=[post.id]),
             {'text': 'Обновленный текст №1',
              'author': PostFormTest.no_author,
              'group': PostFormTest.group.id,
@@ -100,7 +100,7 @@ class PostFormTest(TestCase):
              }
         )
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.post.refresh_from_db()
+        post.refresh_from_db()
         self.assertTrue(
             Post.objects.filter(
                 text='Обновленный текст №1',
@@ -112,14 +112,19 @@ class PostFormTest(TestCase):
 
     def test_post_edit_no_author(self):
         '''НЕ автор НЕ может редактировать пост.'''
+        post = Post.objects.create(
+            text='Текст первого поста для тестов.',
+            author=PostFormTest.author,
+            group=PostFormTest.group,
+        )
         posts_counter = Post.objects.count()
         response = self.another_client.post(
-            reverse('posts:edit', args=[self.post.id]),
+            reverse('posts:edit', args=[post.id]),
             {'text': 'Обновленный текст №2, который мы не увидим'}
         )
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
-        self.post.refresh_from_db()
-        self.assertEqual(self.post.text, 'Текст первого поста для тестов.')
+        post.refresh_from_db()
+        self.assertEqual(post.text, 'Текст первого поста для тестов.')
         self.assertEqual(Post.objects.count(), posts_counter)
 
 
@@ -147,11 +152,6 @@ class CommentFormTest(TestCase):
             author=cls.author,
             group=cls.group,
         )
-        cls.comment = Comment.objects.create(
-            post=cls.post,
-            text='Комментарий №1',
-            author=cls.author,
-        )
 
     @classmethod
     def tearDownClass(cls):
@@ -177,9 +177,9 @@ class CommentFormTest(TestCase):
         self.assertEqual(Comment.objects.count(), comment_counter + 1)
         self.assertTrue(
             Comment.objects.filter(
-                post=CommentFormTest.comment.post.id,
-                text=CommentFormTest.comment.text,
-                author=CommentFormTest.post.author.id
+                post=self.post.id,
+                text='Комментарий №2',
+                author=self.author.pk
             ).exists()
         )
 

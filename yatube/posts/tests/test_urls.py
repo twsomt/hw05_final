@@ -37,7 +37,7 @@ class StaticURLTests(TestCase):
             text='Тестовый комментарий',
             author=cls.author,
         )
-        cls.TEST_DATA_PAGES = [
+        cls.test_data_pages = [
             {
                 'title': 'Главная страница',
                 'url_name': '/',
@@ -72,7 +72,7 @@ class StaticURLTests(TestCase):
                 'html_template': 'posts/follow.html',
             },
         ]
-        cls.TEST_DATA_ACTIONS = [
+        cls.test_data_actions = [
             {
                 'title': 'Прокомментировать пост',
                 'url_name': f'/posts/{StaticURLTests.post.id}/comment/',
@@ -96,7 +96,7 @@ class StaticURLTests(TestCase):
     def test_page_status_get_method(self):
         '''Проверка ответов основных адресов и соответствия шаблонов.'''
 
-        for test in StaticURLTests.TEST_DATA_PAGES:
+        for test in StaticURLTests.test_data_pages:
             with self.subTest(test['title']):
 
                 if test.get('need_authorization'):
@@ -121,7 +121,7 @@ class StaticURLTests(TestCase):
 
     def test_actions_pathes(self):
         '''Адреса действий доступны и возвращат редиректы.'''
-        for test in StaticURLTests.TEST_DATA_ACTIONS:
+        for test in StaticURLTests.test_data_actions:
             with self.subTest(test['title']):
                 response = self.another_client.get(test['url_name'])
                 self.assertEqual(response.status_code, HTTPStatus.FOUND)

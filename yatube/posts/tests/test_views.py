@@ -68,7 +68,7 @@ class ViewsTests(TestCase):
             author=cls.author,
         )
 
-        cls.TEST_DATA_PAGES = [
+        cls.test_data_pages = [
             {
                 'title': 'Главная страница',
                 'reverse_name': 'posts:index',
@@ -106,7 +106,7 @@ class ViewsTests(TestCase):
                 'html_template': 'posts/follow.html',
             },
         ]
-        cls.TEST_DATA_ACTIONS = [
+        cls.test_data_actions = [
             {
                 'title': 'Прокомментировать пост',
                 'reverse_name': 'posts:add_comment',
@@ -135,7 +135,7 @@ class ViewsTests(TestCase):
 
     def test_response_view_func(self):
         '''Функции страниц используют ожидаемые шаблоны.'''
-        for test in ViewsTests.TEST_DATA_PAGES:
+        for test in ViewsTests.test_data_pages:
             with self.subTest(test['title']):
 
                 if test.get('need_authorization'):
@@ -150,7 +150,7 @@ class ViewsTests(TestCase):
 
     def test_actions_pathes(self):
         '''Функции действий доступны через имена и возвращат редиректы.'''
-        for test in ViewsTests.TEST_DATA_ACTIONS:
+        for test in ViewsTests.test_data_actions:
             with self.subTest(test['title']):
                 response = self.another_client.get(
                     reverse(test['reverse_name'], args=test.get('args'))

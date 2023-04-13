@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class PostModelTest(TestCase):
-    """Тестируем модель Post."""
+    '''Тестируем модель Post.'''
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -27,7 +27,7 @@ class PostModelTest(TestCase):
         )
 
     def test_model_post_have_correct_object_names(self):
-        """Проверяем, что у модели Post корректно работает __str__."""
+        '''Проверяем, что у модели Post корректно работает __str__.'''
         expected_post_str = (PostModelTest.post
                              .text[:settings.LEN_DEF__STR__POST_MODEL] + '...')
         self.assertEqual(
@@ -39,7 +39,7 @@ class PostModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """verbose_name в полях модели Post совпадает с ожидаемым."""
+        '''verbose_name в полях модели Post совпадает с ожидаемым.'''
         post = PostModelTest.post
         field_verboses = {
             'text': 'Текст поста',
@@ -53,7 +53,7 @@ class PostModelTest(TestCase):
         self.assertDictEqual(field_verboses, expected_fields)
 
     def test_help_text(self):
-        """help_text в полях модели Post совпадает с ожидаемым."""
+        '''help_text в полях модели Post совпадает с ожидаемым.'''
         post = PostModelTest.post
         field_help_text = {
             'text': 'Текст нового поста',
@@ -68,7 +68,7 @@ class PostModelTest(TestCase):
 
 
 class GroupModelTest(TestCase):
-    """Тестируем модель Group."""
+    '''Тестируем модель Group.'''
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -87,7 +87,7 @@ class GroupModelTest(TestCase):
         )
 
     def test_model_group_have_correct_object_names(self):
-        """Проверяем, что у модели Group корректно работает __str__."""
+        '''Проверяем, что у модели Group корректно работает __str__.'''
         expected_group_str = GroupModelTest.group.title
         self.assertEqual(
             str(GroupModelTest.group),
@@ -98,7 +98,7 @@ class GroupModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """verbose_name в полях модели Group совпадает с ожидаемым."""
+        '''verbose_name в полях модели Group совпадает с ожидаемым.'''
         group = GroupModelTest.group
         field_verboses = {
             'title': 'Название группы',
@@ -110,7 +110,7 @@ class GroupModelTest(TestCase):
         self.assertDictEqual(field_verboses, expected_fields)
 
     def test_help_text(self):
-        """help_text в полях модели Group совпадает с ожидаемым."""
+        '''help_text в полях модели Group совпадает с ожидаемым.'''
         group = GroupModelTest.group
         field_help_text = {
             'title': 'Введите название группы',
@@ -123,7 +123,7 @@ class GroupModelTest(TestCase):
 
 
 class CommentModelTest(TestCase):
-    """Тестируем модель Comment."""
+    '''Тестируем модель Comment.'''
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -152,7 +152,7 @@ class CommentModelTest(TestCase):
         self.author_client.force_login(self.author)
 
     def test_model_post_have_correct_object_names(self):
-        """Проверяем, что у модели Comment корректно работает __str__."""
+        '''Проверяем, что у модели Comment корректно работает __str__.'''
         expected_post_str = (CommentModelTest.post
                              .text[:settings.LEN_DEF__STR__POST_MODEL] + '...')
         self.assertEqual(
@@ -164,7 +164,7 @@ class CommentModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """verbose_name в полях модели Comment совпадает с ожидаемым."""
+        '''verbose_name в полях модели Comment совпадает с ожидаемым.'''
         comment = CommentModelTest.comment
         field_verboses = {
             'post': 'Пост комментария',
@@ -175,7 +175,7 @@ class CommentModelTest(TestCase):
         self.assertDictEqual(field_verboses, expected_fields)
 
     def test_help_text(self):
-        """help_text в полях модели Comment совпадает с ожидаемым."""
+        '''help_text в полях модели Comment совпадает с ожидаемым.'''
         comment = CommentModelTest.comment
         field_help_text = {
             'post': 'Пост, к которому будет относиться комментарий',
@@ -187,7 +187,7 @@ class CommentModelTest(TestCase):
 
 
 class FollowModelTest(TestCase):
-    """Тестируем модель Follow."""
+    '''Тестируем модель Follow.'''
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -205,7 +205,7 @@ class FollowModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """verbose_name в полях модели Follow совпадает с ожидаемым."""
+        '''verbose_name в полях модели Follow совпадает с ожидаемым.'''
         follow = FollowModelTest.follow
         field_verboses = {
             'user': 'Подписчик',
@@ -216,7 +216,7 @@ class FollowModelTest(TestCase):
         self.assertDictEqual(field_verboses, expected_fields)
 
     def test_help_text(self):
-        """help_text в полях модели Follow совпадает с ожидаемым."""
+        '''help_text в полях модели Follow совпадает с ожидаемым.'''
         follow = FollowModelTest.follow
         field_help_text = {
             'user': 'Пользователь, подписавшийся на автора',
@@ -225,3 +225,16 @@ class FollowModelTest(TestCase):
         expected_fields = {field: follow._meta.get_field(
             field).help_text for field in field_help_text}
         self.assertDictEqual(field_help_text, expected_fields)
+
+    def test_model_follow_have_correct_object_names(self):
+        '''Проверяем, что у модели Follow корректно работает __str__.'''
+        expected_follow_str = (f"{FollowModelTest.no_author.username} "
+                               f"подписан на "
+                               f"{FollowModelTest.author.username}")
+        self.assertEqual(
+            str(FollowModelTest.follow),
+            expected_follow_str,
+            "Метод __str__ в модели Follow работает неверно. "
+            f"Ожидалось '{expected_follow_str}', "
+            f"получено '{str(FollowModelTest.follow)}'"
+        )
