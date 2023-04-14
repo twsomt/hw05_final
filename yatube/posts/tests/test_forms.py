@@ -169,9 +169,7 @@ class CommentFormTest(TestCase):
         comment_counter = Comment.objects.count()
         response = self.author_client.post(
             reverse('posts:add_comment', args=[self.post.id],),
-            {'post': self.post.id,
-             'text': 'Комментарий №2',
-             'author': self.author.pk}
+            {'text': 'Комментарий №2'}
         )
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(Comment.objects.count(), comment_counter + 1)
