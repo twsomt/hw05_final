@@ -1,3 +1,20 @@
-# hw05_final
-
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+# Тестовый и учебный проект, такой тестовый, и такой учебный
+### Описание
+Социальная сеть для авторов постов.
+Пока не особо понятно, что будет здесь. Но что-то определенно будет.
+Абсолютно точно можно будет лайкать и скроллить-скроллить-скроллить.
+### Технологии
+- Python 3.9.6
+- Django 4.0.6
+### Запуск проекта в dev-режиме
+- Установите и активируйте виртуальное окружение
+- Установите зависимости из файла requirements.txt
+```
+pip install -r requirements.txt
+``` 
+- В папке с файлом manage.py выполните команду:
+```
+python3 manage.py runserver
+```
+### Авторы
+Андрей
