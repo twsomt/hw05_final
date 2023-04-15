@@ -18,6 +18,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '[::1]',
     'testserver',
+    'www.twsomt1.pythonanywhere.com',
+    'twsomt1.pythonanywhere.com',
 ]
 
 

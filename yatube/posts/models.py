@@ -124,12 +124,12 @@ class Follow(models.Model):
     )
 
     class Meta:
-        constraints = (
+        constraints = [
             models.UniqueConstraint(
-                fields=('user', 'author'),
+                fields=['user', 'author'],
                 name='unique_fields'
             )
-        )
+        ]
         verbose_name = 'Подписчик'
         verbose_name_plural = 'Подписчики'
 
